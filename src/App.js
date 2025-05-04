@@ -3,7 +3,7 @@ import './App.css';
 import { useState } from 'react';
 
 function App() {
-  const product = [
+  const [productList, setProductList] = useState([
     { id: 1, nameP: "קראנץ פיסטוק", price: 9.9, img: "1 (1).jpg" },
     { id: 2, nameP: "גומיגם", price: 10.9, img: "1 (1).png" },
     { id: 3, nameP: "חמשושים", price: 12.9, img: "1 (2).jpg" },
@@ -13,9 +13,10 @@ function App() {
     { id: 7, nameP: "מגנום שקדים", price: 10, img: "1 (6).jpg" },
     { id: 8, nameP: "ויטמינציק ענבים", price: 6, img: "1 (7).jpg" },
     { id: 9, nameP: "קרח מלון", price: 3.5, img: "1 (8).jpg" }
-  ]
+  ])
 
-  const [filteredProduct, setFilteredProduct] = useState(product)
+
+  const [filteredProduct, setFilteredProduct] = useState(productList);
   const [productVal, setProductVal] = useState("")//משתנה המקבל שם מוצר
   const [priceVal, setPriceVal] = useState("")//משתנה המקבל מחיר מוצר
   const [cart, setCart] = useState([]) //מערך של עגלת הקניות
@@ -28,14 +29,21 @@ function App() {
   //הוספת מוצר לחנות לפי מה שנכתב באינפוטים
   const addProduct = () => {
     const newProduct = {
-      id: product[product.length - 1].id + 1,
+      id: productList.length > 0 ? productList[productList.length - 1].id + 1 : 1,
       nameP: productVal,
-      price: priceVal
-    }
-    //עריכת המערך המוצרים שכפול של כל מה שקיים בו והוספה של המוצר החדש
-    product.push(newProduct);
-    setFilteredProduct([...product])
-  }
+      price: priceVal,
+      img: "default.png"
+    };
+
+    const updatedList = [...productList, newProduct];
+    setProductList(updatedList);
+    setFilteredProduct(updatedList);
+
+    setProductVal("");
+    setPriceVal("");
+
+  };
+
 
   //פונקציה הוספה לסל
   const addCart = (p) => {
@@ -57,16 +65,19 @@ function App() {
 
   //פונקצית חיפוש
   const search = (txt) => {
-    setSearchVal(txt)
-    const filteredArr = product.filter(p => p.nameP.includes(txt) || p.price.toString().includes(txt))
-    setFilteredProduct(filteredArr)
-  }
+    setSearchVal(txt);
+    const filteredArr = productList.filter(p =>
+      p.nameP.includes(txt) || p.price.toString().includes(txt)
+    );
+    setFilteredProduct(filteredArr);
+  };
+
   return (
     <div className="App">
       <div className="banner">
-    <h1>ברוכים הבאים לגלידת הקיץ 🍦☀️</h1>
-    <p>בחרו את הארטיק הכי מרענן והכניסו אותו לעגלה!</p>
-  </div>
+        <h1>ברוכים הבאים לגלידת הקיץ 🍦☀️</h1>
+        <p>בחרו את הארטיק הכי מרענן והכניסו אותו לעגלה!</p>
+      </div>
       <div>
         <button onClick={() => setUser("manager")}>מנהל מתחבר</button>
         <button onClick={() => setUser("user")}>משתמש מתחבר</button>
@@ -97,29 +108,29 @@ function App() {
               onChange={(event) => { setProductVal(event.target.value) }} value={productVal} />
             <input type='text' placeholder='הכנס מחיר מוצר'
               onChange={(event) => { setPriceVal(event.target.value) }} value={priceVal} />
-              <button className='button-p' type='button' onClick={ () => {addProduct()}}>הוסף</button>
+            <button className='button-p' type='button' onClick={() => { addProduct() }}>הוסף</button>
           </div>
         </form>}
 
-        <div>
-          <h3>עגלת קניות</h3>
-          <ul>
-            {
-              //רינדור המערך הוספת המוצרים לעגלת הקניות
-              cart.length == 0 ?
+      <div>
+        <h3>עגלת קניות</h3>
+        <ul>
+          {
+            //רינדור המערך הוספת המוצרים לעגלת הקניות
+            cart.length == 0 ?
               <p>עגלת הקניות שלך ריקה! קדימה תתחיל להעמיס...</p>
               :
               cart.map(p => <li>
-                <h5> {p.nameP} : {p.price} ש"ח 
-                  <button onClick={() => { deleteP(p.id)}}>🗑</button>
+                <h5> {p.nameP} : {p.price} ש"ח
+                  <button onClick={() => { deleteP(p.id) }}>🗑</button>
                 </h5>
               </li>)
-            }
-          </ul>
-          <h4>{sumcart} סה"כ מוצרים בעגלה</h4>
+          }
+        </ul>
+        <h4>{sumcart} סה"כ מוצרים בעגלה</h4>
 
-        <button className='button-p' onClick={() => {send()}}>בצע הזמנה</button>
-        </div>
+        <button className='button-p' onClick={() => { send() }}>בצע הזמנה</button>
+      </div>
     </div>
   );
 }
